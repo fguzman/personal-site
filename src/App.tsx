@@ -10,9 +10,8 @@ import React, { useMemo, useEffect, useState } from "react";
  * • Uses Tailwind classes
  */
 
-// ====== EDIT ME: your content ======
 const profile = {
-  name: "Francisco Pérez",
+  name: "Francisco Guzman",
   taglineLines: ["is a product designer,", "builder, and storyteller."],
   blurb:
     "I lead 0→1 product design and strategy. I care about simple, human tools that help people create, connect, and build sustainable businesses.",
