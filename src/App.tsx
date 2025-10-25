@@ -1,12 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 /**
  * Francisco Guzman — Personal Site
  * ---------------------------------------------------------
  * • Minimal landing: name + short blurb
  * • Home shows Selected Projects (no images) and footer links
- * • Resume page (#resume) uses high‑level entries: company, role, years, one‑line overview, plus education
- * • Balanced spacing, neutral contrast, clear typography
+ * • Resume page (#resume): company, role, years, one‑line overview, education
+ * • Balanced spacing/contrast; accessible nav
+ * • Added: animated view transitions (cross‑fade + slight slide),
+ *          reduced‑motion friendly, active pill nav for Resume,
+ *          scroll position restore when returning home.
  */
 
 const profile = {
@@ -101,125 +105,177 @@ const resume = {
 };
 
 export default function PersonalSite() {
-  const [view, setView] = useState('home');
+  const [view, setView] = useState<'home' | 'resume'>('home');
+  const prefersReducedMotion = useReducedMotion();
+  const homeScrollRef = useRef(0);
 
+  // Hash routing + scroll restore
   useEffect(() => {
-    const applyHash = () => setView(window.location.hash === '#resume' ? 'resume' : 'home');
-    applyHash();
-    window.addEventListener('hashchange', applyHash);
-    return () => window.removeEventListener('hashchange', applyHash);
+    const onHash = () => {
+      const nextIsResume = window.location.hash === '#resume';
+      if (nextIsResume) {
+        // store home scroll and go to top for resume
+        homeScrollRef.current = window.scrollY;
+        setView('resume');
+        window.scrollTo({ top: 0, behavior: 'instant' as any });
+      } else {
+        setView('home');
+        // restore prior position
+        window.requestAnimationFrame(() => {
+          window.scrollTo({ top: homeScrollRef.current, behavior: 'instant' as any });
+        });
+      }
+    };
+    onHash();
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
-  if (view === 'resume') return <ResumePage profile={profile} resume={resume} />;
-
-  return (
-    <main className="mx-auto max-w-3xl px-5 sm:px-6 py-8 sm:py-12 text-zinc-900 dark:text-zinc-100">
+  // Shared header with active pill nav
+  const Header: React.FC = () => {
+    const isResume = view === 'resume';
+    return (
       <header className="flex items-center justify-between pb-6">
         <a href="#top" className="font-medium tracking-tight text-zinc-700 dark:text-zinc-200 text-xl sm:text-2xl">{profile.name}</a>
-        <nav className="flex items-center gap-5 text-sm text-zinc-500 dark:text-zinc-400">
-          <a className="hover:text-inherit" href={profile.resumeUrl}>resume</a>
+        <nav className="flex items-center gap-3 text-sm">
+          <a
+            href={profile.resumeUrl}
+            aria-current={isResume ? 'page' : undefined}
+            className={[
+              'inline-flex items-center rounded-full border px-3 py-1 focus:outline-none focus-visible:ring-2',
+              isResume
+                ? 'border-zinc-300 text-zinc-900 dark:text-zinc-100 dark:border-zinc-600 bg-zinc-100 dark:bg-zinc-800'
+                : 'border-zinc-300 text-zinc-600 dark:text-zinc-300 dark:border-zinc-600 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/60'
+            ].join(' ')}
+          >
+            resume
+          </a>
         </nav>
       </header>
+    );
+  };
 
-      {/* Landing */}
-      <section id="top" className="space-y-4">
-        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 leading-snug">{profile.tagline}</h1>
-        <p className="text-base sm:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">{profile.blurb}</p>
-      </section>
+  const spring = { duration: prefersReducedMotion ? 0 : 0.22, ease: 'easeOut' as const };
 
-      <Divider />
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      {view === 'home' ? (
+        <motion.main
+          key="home"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={spring}
+          className="mx-auto max-w-3xl px-5 sm:px-6 py-8 sm:py-12 text-zinc-900 dark:text-zinc-100"
+        >
+          <Header />
 
-      {/* Selected Projects (no images) */}
-      <section id="projects" className="scroll-mt-24">
-        <h2 className="text-xl sm:text-[22px] font-semibold tracking-tight text-zinc-800 dark:text-zinc-100">Selected Projects</h2>
-        <div className="mt-6 space-y-10">
-          {projects.map((p) => (
-            <article key={p.title} className="space-y-3 sm:space-y-4">
-              <h3 className="font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
-                <span className="mr-2">{p.title}</span>
-                <span className="text-zinc-400">{p.date}</span>
-              </h3>
-              <ul className="flex flex-wrap gap-2 text-xs text-zinc-600 dark:text-zinc-300">
-                {p.tags.map((t) => (
-                  <li key={t} className="rounded-full border border-zinc-200 px-2 py-0.5 dark:border-zinc-600">{t}</li>
-                ))}
-              </ul>
-              <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-300">{p.blurb}</p>
-              <div className="flex flex-wrap gap-4 text-sm">
-                {p.links.map((l) => (
-                  <a key={l.label} href={l.href} className="underline underline-offset-4 hover:no-underline">{l.label}</a>
-                ))}
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
+          {/* Landing */}
+          <section id="top" className="space-y-4">
+            <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 leading-snug">{profile.tagline}</h1>
+            <p className="text-base sm:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">{profile.blurb}</p>
+          </section>
 
-      <Divider />
+          <Divider />
 
-      {/* Footer links */}
-      <footer className="pt-6 sm:pt-8 text-sm text-zinc-500 dark:text-zinc-400">
-        <ul className="space-y-3">
-          {profile.socials.map((s) => (
-            <li key={s.label} className="flex justify-between border-b border-dotted border-zinc-300 dark:border-zinc-700 pb-1">
-              <span className="text-zinc-700 dark:text-zinc-300">{s.label}</span>
-              <a href={s.href} className="text-zinc-800 dark:text-zinc-200 hover:underline">{s.handle}</a>
-            </li>
-          ))}
-        </ul>
-      </footer>
-    </main>
+          {/* Selected Projects (no images) */}
+          <section id="projects" className="scroll-mt-24">
+            <h2 className="text-xl sm:text-[22px] font-semibold tracking-tight text-zinc-800 dark:text-zinc-100">Selected Projects</h2>
+            <div className="mt-6 space-y-10">
+              {projects.map((p) => (
+                <article key={p.title} className="space-y-3 sm:space-y-4 max-w-prose">
+                  <h3 className="font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
+                    <span className="mr-2">{p.title}</span>
+                    <span className="text-zinc-400">{p.date}</span>
+                  </h3>
+                  <ul className="flex flex-wrap gap-2 text-xs text-zinc-600 dark:text-zinc-300">
+                    {p.tags.map((t) => (
+                      <li key={t} className="rounded-full border border-zinc-200 px-2 py-0.5 dark:border-zinc-600">{t}</li>
+                    ))}
+                  </ul>
+                  <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-300">{p.blurb}</p>
+                  <div className="flex flex-wrap gap-4 text-sm">
+                    {p.links.map((l) => (
+                      <a key={l.label} href={l.href} className="underline underline-offset-4 hover:no-underline">{l.label}</a>
+                    ))}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <Divider />
+
+          {/* Footer links */}
+          <footer className="pt-6 sm:pt-8 text-sm text-zinc-500 dark:text-zinc-400">
+            <ul className="space-y-3">
+              {profile.socials.map((s) => (
+                <li key={s.label} className="flex justify-between border-b border-dotted border-zinc-300 dark:border-zinc-700 pb-1">
+                  <span className="text-zinc-700 dark:text-zinc-300">{s.label}</span>
+                  <a href={s.href} className="text-zinc-800 dark:text-zinc-200 hover:underline">{s.handle}</a>
+                </li>
+              ))}
+            </ul>
+          </footer>
+        </motion.main>
+      ) : (
+        <motion.main
+          key="resume"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={spring}
+          className="mx-auto max-w-3xl px-5 sm:px-6 py-8 sm:py-12 text-zinc-900 dark:text-zinc-100"
+        >
+          <Header />
+
+          <header className="flex items-start justify-between gap-6 pb-6">
+            <div>
+              <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">{profile.name}</h1>
+              <p className="mt-2 max-w-prose text-base sm:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">A selection of high‑level roles and education.</p>
+            </div>
+            <div className="flex flex-col items-end gap-2">
+              <a href="#top" className="text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-200">← home</a>
+            </div>
+          </header>
+
+          <section className="space-y-6">
+            <h2 className="text-lg sm:text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Experience</h2>
+            <ul className="space-y-6">
+              {resume.experience.map((e) => (
+                <li key={e.org + e.role}>
+                  <div className="flex items-baseline justify-between gap-4">
+                    <div>
+                      <div className="font-medium tracking-tight text-zinc-900 dark:text-zinc-100">{e.role} · {e.org}</div>
+                    </div>
+                    <div className="text-sm text-zinc-400">{e.period}</div>
+                  </div>
+                  <p className="mt-1 text-base leading-relaxed text-zinc-700 dark:text-zinc-300">{e.overview}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <Divider />
+
+          <section>
+            <h2 className="text-lg sm:text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Education</h2>
+            <ul className="mt-3 space-y-3">
+              {resume.education.map((ed) => (
+                <li key={ed.school + ed.period}>
+                  <div className="font-medium tracking-tight text-zinc-900 dark:text-zinc-100">{ed.school}</div>
+                  <div className="text-sm sm:text-base text-zinc-700 dark:text-zinc-300">{ed.degree}</div>
+                  <div className="text-sm text-zinc-400">{ed.period}</div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </motion.main>
+      )}
+    </AnimatePresence>
   );
 }
 
 function Divider() {
   return <hr className="my-10 border-zinc-200/70 dark:border-zinc-800" />;
-}
-
-function ResumePage({ profile, resume }) {
-  return (
-    <main className="mx-auto max-w-3xl px-5 sm:px-6 py-8 sm:py-12 text-zinc-900 dark:text-zinc-100">
-      <header className="flex items-start justify-between gap-6 pb-6">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">{profile.name}</h1>
-          <p className="mt-2 max-w-prose text-base sm:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">A selection of high‑level roles and education.</p>
-        </div>
-        <div className="flex flex-col items-end gap-2">
-          <a href="#top" className="text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-200">← home</a>
-        </div>
-      </header>
-
-      <section className="space-y-6">
-        <h2 className="text-lg sm:text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Experience</h2>
-        <ul className="space-y-6">
-          {resume.experience.map((e) => (
-            <li key={e.org + e.role}>
-              <div className="flex items-baseline justify-between gap-4">
-                <div>
-                  <div className="font-medium tracking-tight text-zinc-900 dark:text-zinc-100">{e.role} · {e.org}</div>
-                </div>
-                <div className="text-sm text-zinc-400">{e.period}</div>
-              </div>
-              <p className="mt-1 text-base leading-relaxed text-zinc-700 dark:text-zinc-300">{e.overview}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <Divider />
-
-      <section>
-        <h2 className="text-lg sm:text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Education</h2>
-        <ul className="mt-3 space-y-3">
-          {resume.education.map((ed) => (
-            <li key={ed.school + ed.period}>
-              <div className="font-medium tracking-tight text-zinc-900 dark:text-zinc-100">{ed.school}</div>
-              <div className="text-sm sm:text-base text-zinc-700 dark:text-zinc-300">{ed.degree}</div>
-              <div className="text-sm text-zinc-400">{ed.period}</div>
-            </li>
-          ))}
-        </ul>
-      </section>
-    </main>
-  );
 }
