@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
 
+/**
+ * Francisco Guzman — Personal Site
+ * ---------------------------------------------------------
+ * • Minimal landing: name + short blurb
+ * • Home shows Selected Projects (no images) and footer links
+ * • Resume page (#resume) uses high‑level entries: company, role, years, one‑line overview, plus education
+ * • Balanced spacing, neutral contrast, clear typography
+ */
+
 const profile = {
   name: "Francisco Guzman",
   tagline:
@@ -41,7 +50,7 @@ const projects = [
   },
   {
     title: "Early Startup Years: Instacart, Nuro, Prismatic",
-    date: "2014–19",
+    date: "2013–19",
     tags: ["Startups", "0→1", "Product Design"],
     blurb:
       "Early design work across consumer logistics, robotics, and personalized news.",
@@ -53,7 +62,7 @@ const projects = [
   },
 ];
 
-// ---- Resume (high‑level summary from attached resume) ----
+// ---- Resume (high‑level summary) ----
 const resume = {
   experience: [
     {
@@ -77,6 +86,13 @@ const resume = {
       overview:
         "Second design hire leading fulfillment and logistics products (in‑store navigation, order changes, scheduling/pay) to scale operations.",
     },
+    {
+      org: "Prismatic",
+      role: "Interaction Designer",
+      period: "2013 – 2015",
+      overview:
+        "Designed core interaction patterns for personalized news discovery across mobile and web, collaborating closely with founders on product direction.",
+    },
   ],
   education: [
     { school: "Stanford University", degree: "M.S. Symbolic Systems", period: "2013" },
@@ -97,38 +113,38 @@ export default function PersonalSite() {
   if (view === 'resume') return <ResumePage profile={profile} resume={resume} />;
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10 text-zinc-900 dark:text-zinc-100">
+    <main className="mx-auto max-w-3xl px-5 sm:px-6 py-8 sm:py-12 text-zinc-900 dark:text-zinc-100">
       <header className="flex items-center justify-between pb-6">
-        <a href="#top" className="font-medium tracking-tight text-zinc-700 dark:text-zinc-200 text-lg">{profile.name}</a>
+        <a href="#top" className="font-medium tracking-tight text-zinc-700 dark:text-zinc-200 text-xl sm:text-2xl">{profile.name}</a>
         <nav className="flex items-center gap-5 text-sm text-zinc-500 dark:text-zinc-400">
           <a className="hover:text-inherit" href={profile.resumeUrl}>resume</a>
         </nav>
       </header>
 
       {/* Landing */}
-      <section id="top" className="space-y-3">
-        <h1 className="text-xl font-semibold tracking-tight text-zinc-800 dark:text-zinc-100">{profile.tagline}</h1>
-        <p className="text-base leading-relaxed text-zinc-600 dark:text-zinc-300">{profile.blurb}</p>
+      <section id="top" className="space-y-4">
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 leading-snug">{profile.tagline}</h1>
+        <p className="text-base sm:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">{profile.blurb}</p>
       </section>
 
       <Divider />
 
       {/* Selected Projects (no images) */}
       <section id="projects" className="scroll-mt-24">
-        <h2 className="text-lg font-semibold tracking-tight text-zinc-800 dark:text-zinc-100">Selected Projects</h2>
+        <h2 className="text-xl sm:text-[22px] font-semibold tracking-tight text-zinc-800 dark:text-zinc-100">Selected Projects</h2>
         <div className="mt-6 space-y-10">
           {projects.map((p) => (
-            <article key={p.title} className="space-y-2">
-              <h3 className="font-medium tracking-tight">
+            <article key={p.title} className="space-y-3 sm:space-y-4">
+              <h3 className="font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
                 <span className="mr-2">{p.title}</span>
                 <span className="text-zinc-400">{p.date}</span>
               </h3>
-              <ul className="flex flex-wrap gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+              <ul className="flex flex-wrap gap-2 text-xs text-zinc-600 dark:text-zinc-300">
                 {p.tags.map((t) => (
-                  <li key={t} className="rounded-full border border-zinc-200 px-2 py-0.5 dark:border-zinc-700">{t}</li>
+                  <li key={t} className="rounded-full border border-zinc-200 px-2 py-0.5 dark:border-zinc-600">{t}</li>
                 ))}
               </ul>
-              <p className="leading-relaxed text-zinc-600 dark:text-zinc-300">{p.blurb}</p>
+              <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-300">{p.blurb}</p>
               <div className="flex flex-wrap gap-4 text-sm">
                 {p.links.map((l) => (
                   <a key={l.label} href={l.href} className="underline underline-offset-4 hover:no-underline">{l.label}</a>
@@ -142,11 +158,11 @@ export default function PersonalSite() {
       <Divider />
 
       {/* Footer links */}
-      <footer className="pt-6 text-sm text-zinc-500 dark:text-zinc-400">
+      <footer className="pt-6 sm:pt-8 text-sm text-zinc-500 dark:text-zinc-400">
         <ul className="space-y-3">
           {profile.socials.map((s) => (
             <li key={s.label} className="flex justify-between border-b border-dotted border-zinc-300 dark:border-zinc-700 pb-1">
-              <span className="text-zinc-600 dark:text-zinc-300">{s.label}</span>
+              <span className="text-zinc-700 dark:text-zinc-300">{s.label}</span>
               <a href={s.href} className="text-zinc-800 dark:text-zinc-200 hover:underline">{s.handle}</a>
             </li>
           ))}
@@ -162,31 +178,29 @@ function Divider() {
 
 function ResumePage({ profile, resume }) {
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10 text-zinc-900 dark:text-zinc-100">
+    <main className="mx-auto max-w-3xl px-5 sm:px-6 py-8 sm:py-12 text-zinc-900 dark:text-zinc-100">
       <header className="flex items-start justify-between gap-6 pb-6">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">{profile.name}</h1>
-          <p className="mt-2 max-w-prose text-zinc-600 dark:text-zinc-300">A selection of high‑level roles and education.</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">{profile.name}</h1>
+          <p className="mt-2 max-w-prose text-base sm:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">A selection of high‑level roles and education.</p>
         </div>
         <div className="flex flex-col items-end gap-2">
           <a href="#top" className="text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-200">← home</a>
-          {/* Print to PDF */}
-          <button onClick={() => window.print()} className="rounded-lg border border-zinc-200 px-3 py-1.5 text-sm hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800">Download PDF</button>
         </div>
       </header>
 
       <section className="space-y-6">
-        <h2 className="text-lg font-semibold tracking-tight">Experience</h2>
+        <h2 className="text-lg sm:text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Experience</h2>
         <ul className="space-y-6">
           {resume.experience.map((e) => (
             <li key={e.org + e.role}>
               <div className="flex items-baseline justify-between gap-4">
                 <div>
-                  <div className="font-medium tracking-tight">{e.role} · {e.org}</div>
+                  <div className="font-medium tracking-tight text-zinc-900 dark:text-zinc-100">{e.role} · {e.org}</div>
                 </div>
                 <div className="text-sm text-zinc-400">{e.period}</div>
               </div>
-              <p className="mt-1 text-zinc-600 dark:text-zinc-300">{e.overview}</p>
+              <p className="mt-1 text-base leading-relaxed text-zinc-700 dark:text-zinc-300">{e.overview}</p>
             </li>
           ))}
         </ul>
@@ -195,12 +209,12 @@ function ResumePage({ profile, resume }) {
       <Divider />
 
       <section>
-        <h2 className="text-lg font-semibold tracking-tight">Education</h2>
+        <h2 className="text-lg sm:text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Education</h2>
         <ul className="mt-3 space-y-3">
           {resume.education.map((ed) => (
             <li key={ed.school + ed.period}>
-              <div className="font-medium tracking-tight">{ed.school}</div>
-              <div className="text-sm text-zinc-600 dark:text-zinc-300">{ed.degree}</div>
+              <div className="font-medium tracking-tight text-zinc-900 dark:text-zinc-100">{ed.school}</div>
+              <div className="text-sm sm:text-base text-zinc-700 dark:text-zinc-300">{ed.degree}</div>
               <div className="text-sm text-zinc-400">{ed.period}</div>
             </li>
           ))}
