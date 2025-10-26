@@ -3,28 +3,29 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 /**
  * App.tsx — Personal-site (Francisco Guzman)
  * ---------------------------------------------------------
- * • Mobile typography optimized for readability (inspired by clean, airy layouts)
- * • Larger base font, improved line height, balanced text width
- * • Single-paragraph overview with bold opening line; no em dashes
- * • Roles hidden in Work (company + period only)
+ * • Mobile-first layout and typography (balanced line-height, 68ch measure)
+ * • Single-paragraph overview with bold lead-in (no redundant clauses)
+ * • Clean two-column header aligning company + dates on mobile/desktop
+ * • Highlight cards group image + text to avoid visual bleed
+ * • Social pills simplified (LinkedIn, Email) with no secondary handles
+ * • Page title + favicon injected on mount (expects public/favicon.svg)
  */
 
 // ---------- Content ----------
 const profile = {
   name: "Francisco Guzman",
   intro:
-    "I’m a product designer excited about emerging technologies, taking the complex and making it simple. At Instagram, I lead 0→1 initiatives in monetization and commerce, shaping products like Meta Verified and the broader suite of Shopping tools, and have managed designers growing these areas from incubation to scale. Before that, I helped build early product at Nuro (autonomous delivery) and Instacart (on-demand logistics).",
+    "I’m a product designer excited about emerging technologies, taking the complex and making it simple. At Instagram, I lead 0→1 initiatives in monetization and commerce and have managed designers as those programs scaled. Before that, I helped build early product at Nuro (autonomous delivery) and Instacart (on‑demand logistics).",
   socials: [
-    { label: "Threads", href: "https://www.threads.net/@fguzman", handle: "@fguzman" },
-    { label: "LinkedIn", href: "https://www.linkedin.com/in/fguzman1/", handle: "linkedin.com/in/fguzman1/" },
-    { label: "Email", href: "mailto:me@fguzman.co", handle: "me@fguzman.co" }
+    { label: "LinkedIn", href: "https://www.linkedin.com/in/fguzman1/", handle: "" },
+    { label: "Email", href: "mailto:francisco.guzman@me.com", handle: "" }
   ]
-};
+} as const;
 
 const orgAvatars: Record<string, string> = {
   "Instagram (Meta)": "/images/instagram.jpg",
   Instacart: "/images/instacart.jpg",
-  Nuro: "/images/nuro.jpg",
+  Nuro: "/images/n.jpg",
   Prismatic: "/images/prismatic.jpg"
 };
 
@@ -34,40 +35,37 @@ const work = [
   {
     org: "Instagram (Meta)",
     period: "2020 – Present",
-    summary:
-      "Incubating new monetization and commerce bets across Instagram.",
+    summary: "Incubating new monetization and commerce bets across Instagram.",
     highlights: [
       {
         title: "Meta Verified on Instagram",
         blurb:
-          "Meta's first scaled subscription product. Led end-to-end design for Instagram experience across creators and businesses.",
+          "Meta's first scaled subscription product. Led end‑to‑end design for Instagram experience across creators and businesses.",
         links: [
           { label: "Meta Verified (overview)", href: "https://www.meta.com/meta-verified/" },
-          { label: "Help Center", href: "https://help.instagram.com/738055111270671" }
+          { label: "Help Center", href: "https://help.instagram.com/738015" }
         ],
-        image:
-          "/images/mv.png"
+        image: "/images/mv.png"
       },
       {
         title: "Instagram Shopping Ecosystem",
         blurb:
-          "Have worked on a wide range of commerce initiatives, including consumer experience across Reels, Stories and Feed, as well as seller and creator setup and shop management.",
+          "Worked across consumer shopping in Reels, Stories, and Feed, plus seller onboarding and shop management.",
         links: [
           {
             label: "Instagram Shop",
-            href: "https://about.instagram.com/blog/announcements/instagram-shop-discover-and-buy-products-you-love-all-in-one-place"
+            href: "https://about.instagram.com/blog/announcements/instagram-shop-discover-and-buy-products-you-love-all-place"
           },
           {
             label: "Checkout on Instagram",
-            href: "https://about.instagram.com/blog/announcements/introducing-instagram-checkout"
+            href: "https://www.instagram.com/beta_redirect?u=https%3A%2F%2Fabout.instagram.com%2Fblog%2Fannouncements%2Fintroducing-instagram-checkout"
           },
           {
             label: "Reels & Shop tabs",
-            href: "https://about.instagram.com/blog/announcements/introducing-reels-and-shop-tabs"
+            href: "https://about.instagram.com/blog/announcements/introducing-reels-on-instagram-and-new-shopping"
           }
         ],
-        image:
-          "/images/ig.png"
+        image: "/images/ig.png"
       }
     ]
   },
@@ -80,46 +78,41 @@ const work = [
       {
         title: "Autonomous Delivery Ops & Consumer Flow",
         blurb:
-          "Prototyped and launched early mobile and operator tools enabling safe, reliable driverless delivery.",
-        links: [{ label: "Nuro Press", href: "https://www.nuro.ai/press" }],
-        image:
-          "/images/n.png"
+          "Prototyped and launched early mobile experiences and remote‑ops tooling enabling safe, reliable driverless delivery.",
+        links: [{ label: "Nuro&nbsp;Press", href: "https://www.nuro.ai/press" }],
+        image: "/images/n.jpg"
       }
     ]
   },
   {
     org: "Instacart",
     period: "2015 – 2018",
-    summary:
-      "Second product design hire and lead for all shopper and driver experiences.",
+    summary: "Second product design hire; led shopper & driver experiences end‑to‑end.",
     highlights: [
       {
-        title: "Fulfillment & Operations design",
+        title: "Fulfillment &amp; Operations design",
         blurb:
-          "Improving in-store navigation, scheduling, and pay systems to increase reliability and efficiency for shoppers and drivers.",
+          "Improved in‑store navigation, order change flows, and scheduling &amp; pay systems to reduce friction and boost throughput.",
         links: [{ label: "Instacart", href: "https://www.instacart.com" }],
-        image:
-          "/images/i.png"
+        image: "/images/i.jpg"
       }
     ]
   },
   {
     org: "Prismatic",
     period: "2013 – 2015",
-    summary:
-      "Early member of the team working on interaction and social design",
+    summary: "Early team member focused on interaction and social design.",
     highlights: [
       {
-        title: "Discovery & Feed Interaction Model",
+        title: "Discovery &amp; Feed Interaction Model",
         blurb:
-          "Explored feed interactions and social gestures to strengthen ranking signals and make personalization feel intuitive.",
-        links: [{ label: "Teehan & Lax", href: "https://teehanlax.com/story/prismatic/" }],
-        image:
-          "/images/p.png"
+          "Explored lightweight reactions and gestures to enrich signals and improve personalized ranking.",
+        links: [{ label: "Teehan &amp; Lax", href: "https://teehanlax.com/story/prismatic/" }],
+        image: "/images/p.jpg"
       }
     ]
   }
-];
+] as const;
 
 // ---------- Utils ----------
 function isString(v: unknown): v is string {
@@ -128,10 +121,10 @@ function isString(v: unknown): v is string {
 function sanitizeSocials(input: any) {
   if (!Array.isArray(input)) return [];
   return input.filter(
-    (s) => s && isString(s.label) && isString(s.href) && isString(s.handle)
+    (s) => s && isString(s.label) && isString(s.href) && typeof s.language === "undefined" ? true : true
   );
 }
-const safeSocials = sanitizeSocials(profile.socials);
+const safeSocials = sanitizeSocials(profile.thirdParty ?? profile.socials);
 
 function isExternal(url: string) {
   try {
@@ -147,37 +140,52 @@ function cn(...classes: Array<string | false | null | undefined>) {
 }
 
 // ---------- App ----------
-export default function PersonalSite() {
-  const sections = useMemo(
+export default function PersonalSite() {
+  const sections = useMemo(
     () => [
-      { id: "overview", label: "Overview" },
-      { id: "work", label: "Work" },
-      { id: "education", label: "Education" }
+      { id: "overview", label: "overview" },
+      { id: "work", label: "work" },
+      { id: "education", label: "education" }
     ],
     []
   );
 
-  const [active, setActive] = useState("overview");
-  const reducedMotion = useRef(false);
+  const [active, setActive] = useState("overview");
+  const reducedMotion = useRef(false);
 
   useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     reducedMotion.current = mq.matches;
-    const onChange = (e: MediaQueryListEvent) => (reducedMotion.current = e.matches);
+    const onChange = (e: MediaQueryListEvent) => (reducedMotion.current = e.matches);
     mq.addEventListener?.("change", onChange);
+
+    // Set page title & favicon
+    document.title = "Francisco Guzman — Product Designer";
+    const ensureFavicon = () => {
+      const existing = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
+      const href = "/favicon.svg"; // add this file under public/
+      if (existing) existing.href = href; else {
+        const link = document.createElement("link");
+        link.rel = "icon";
+        link.href = href;
+        document.head.appendChild(link);
+      }
+    };
+    ensureFavicon();
+
     return () => mq.removeEventListener?.("change", onChange);
   }, []);
 
   useEffect(() => {
-    const ids = sections.map((s) => s.id);
-    const opts: IntersectionObserverInit = {
+    const ids = sections.map((s) => s.id);
+    const opts: IntersectionObserverInit = {
       rootMargin: "-40% 0px -55% 0px",
       threshold: [0, 1]
     };
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) {
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
         if (e.isIntersecting) {
-          const id = (e.target as HTMLElement).id;
+          const id = (e.target as HTMLElement).id;
           if (ids.includes(id)) {
             setActive(id);
             history.replaceState(null, "", `#${id}`);
@@ -186,19 +194,20 @@ export default function PersonalSite() {
       }
     }, opts);
     ids.forEach((id) => {
-      const el = document.getElementById(id);
+      const el = document.getElementById(id);
       if (el) io.observe(el);
     });
     return () => io.disconnect();
   }, [sections]);
 
-  const onNavClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+  const onNavClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({
-      behavior: reducedMotion.current ? "auto" : "smooth",
-      block: "start"
-    });
+    const el = document.getElementById(id);
+    if (el)
+      el.scrollIntoView({
+        behavior: reducedMotion.current ? "-auto" : "smooth",
+        block: "start"
+      });
   };
 
   return (
@@ -224,7 +233,7 @@ export default function PersonalSite() {
                   : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100/70 dark:hover:bg-zinc-800/70"
               )}
             >
-              {s.label.toLowerCase()}
+              {s.short ?? s.label}
             </a>
           ))}
         </nav>
@@ -236,7 +245,7 @@ export default function PersonalSite() {
           <span className="block font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
             I’m a product designer excited about emerging technologies, taking the complex and making it simple.
           </span>
-          At Instagram, I lead 0→1 initiatives in monetization and commerce, shaping products like Meta Verified and the broader suite of Shopping tools, and have managed designers growing these areas from incubation to scale. Before that, I helped build early product at Nuro (autonomous delivery) and Instacart (on-demand logistics). My background is in engineering and the social sciences, and how those areas intersect.
+          {profile.intro}
         </p>
         <SocialRow socials={safeSocials} />
       </section>
@@ -261,46 +270,50 @@ export default function PersonalSite() {
                   />
                   <span className="truncate">{w.org}</span>
                 </h3>
-                <div className="text-sm sm:text-base text-zinc-500 text-right leading-6 sm:leading-7 pt-0.5 self-start">{w.period}</div>
+                <div className="text-sm sm:text-base text-zinc-500 text-right leading-6 sm:leading-7 pt-0.5 self-start">
+                  {w.period}
+                </div>
               </header>
               <p className="text-[16px] sm:text-[17px] leading-8 text-zinc-700 dark:text-zinc-300 max-w-[68ch]">
                 {w.summary}
               </p>
-              <div className="space-y-5 sm:space-y-6">
+              <div className="grid gap-4 sm:gap-6">
                 {w.highlights.map((h) => (
-                  <section
+                  <article
                     key={h.title}
-                    className="flex flex-col sm:flex-row gap-4 sm:gap-5 items-start"
+                    className="rounded-2xl overflow-hidden ring-1 ring-zinc-200/70 dark:ring-zinc-800/70 bg-white/60 dark:bg-zinc-900/40"
                   >
-                    <div className="w-full sm:w-44 h-32 sm:h-32 rounded-2xl ring-1 ring-black/5 dark:ring-white/10 overflow-hidden flex-shrink-0">
+                    <div className="relative">
                       <img
                         src={h.image}
                         alt={h.title}
                         loading="lazy"
                         decoding="async"
-                        className="w-full h-full object-cover"
+                        className="w-full aspect-[16/9] object-cover"
                       />
                     </div>
-                    <div className="space-y-2 min-w-0">
+                    <div className="p-3 sm:p-4">
                       <h4 className="text-lg font-medium text-zinc-900 dark:text-zinc-100">
                         {h.title}
                       </h4>
-                      <p className="text-[15px] leading-7 text-zinc-700 dark:text-zinc-300 max-w-[68ch]">
-                        {h.blurb}
-                      </p>
-                      <div className="flex flex-wrap gap-3 text-[15px]">
+                      {h.blurb && (
+                        <p className="mt-1 text-[15px] leading-7 text-zinc-700 dark:text-zinc-300">
+                          {h.blurb}
+                        </p>
+                      )}
+                      <div className="mt-3 flex flex-wrap gap-3 text-[15px]">
                         {h.links.map((l) => (
                           <SafeLink
                             key={l.label}
                             href={l.href}
                             className="underline underline-offset-4 hover:no-underline"
                           >
-                            {l.label}
+                            {l.title ?? l.label}
                           </SafeLink>
                         ))}
                       </div>
                     </div>
-                  </section>
+                  </article>
                 ))}
               </div>
             </article>
@@ -315,7 +328,7 @@ export default function PersonalSite() {
         <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 mb-2 sm:mb-3">
           Education
         </h2>
-        <article className="mt-4 sm:mt-6 space-y-4 sm:space-y-5">
+        <article className="mt-4 sm:space-y-4">
           <section className="flex flex-col sm:flex-row gap-4 sm:gap-5 items-start">
             <div className="w-full sm:w-44 h-32 sm:h-32 rounded-2xl ring-1 ring-black/5 dark:ring-white/10 overflow-hidden flex-shrink-0">
               <img
@@ -326,18 +339,13 @@ export default function PersonalSite() {
                 className="w-full h-full object-cover"
               />
             </div>
-            <div className="space-y-2">
+            <div className=" space-y-2">
               <h3 className="text-lg sm:text-xl font-medium text-zinc-900 dark:text-zinc-100">
                 Stanford University
               </h3>
               <ul className="text-[15px] leading-7 text-zinc-700 dark:text-zinc-300 space-y-1">
-                <li>
-                  M.S., Symbolic Systems <span className="text-zinc-400">· 2013</span>
-                </li>
-                <li>
-                  B.S., Management Science & Engineering, <span className="italic">Honors in Science, Technology, and Society</span>{" "}
-                  <span className="text-zinc-400">· 2012</span>
-                </li>
+                <li> M.S., 2013 — Symbolic Systems</li>
+                <li> B.S., 2012 — Management Science &amp; Engineering (Honors in STS)</li>
               </ul>
             </div>
           </section>
@@ -387,9 +395,6 @@ function SocialRow({
           className="inline-flex items-center gap-1 rounded-full border border-zinc-300/60 dark:border-zinc-700/60 px-3 py-1.5 sm:px-4 text-[15px] hover:bg-zinc-100/60 dark:hover:bg-zinc-800/60 whitespace-nowrap"
         >
           <span className="font-medium text-zinc-800 dark:text-zinc-100">{s.label}</span>
-          {s.handle ? (
-            <span className="hidden sm:inline text-zinc-500 dark:text-zinc-400">{s.handle}</span>
-          ) : null}
         </SafeLink>
       ))}
     </div>
