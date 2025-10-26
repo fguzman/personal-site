@@ -29,7 +29,7 @@ const orgAvatars: Record<string, string> = {
   "Instagram (Meta)": "/images/instagram.jpg",
   Instacart: "/images/instacart.jpg",
   Nuro: "/images/nuro.jpg",
-  Prismatic: "/images/p.png",
+  Prismatic: "/images/prismatic.jpg",
   "Stanford University": "/images/s.jpg"
 };
 
@@ -98,7 +98,7 @@ const work: ReadonlyArray<WorkItem> = [
         blurb:
           "Prototyped and launched early mobile experiences and remote‑ops tooling enabling safe, reliable driverless delivery.",
         links: [{ label: "Nuro Press", href: "https://www.nuro.ai/press" }],
-        image: "/images/nuro.jpg"
+        image: "/images/n.png"
       }
     ]
   },
@@ -112,7 +112,7 @@ const work: ReadonlyArray<WorkItem> = [
         blurb:
           "Improved in‑store navigation, order change flows, and scheduling & pay systems to reduce friction and boost throughput.",
         links: [{ label: "Instacart", href: "https://www.instacart.com" }],
-        image: "/images/instacart.jpg"
+        image: "/images/i.png"
       }
     ]
   },
