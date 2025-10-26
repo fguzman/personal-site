@@ -3,21 +3,22 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 /**
  * App.tsx — Personal-site (Francisco Guzman)
  * ---------------------------------------------------------
- * • Updated education degrees (M.S. Symbolic Systems, B.S. Management Science & Engineering)
- * • Rounded favicon (uses /public/images/fav.png)
- * • Prevents automatic scroll to #work on load
+ * • Updated education project blurbs and added links
+ * • Removed redundant intro phrase from overview
  */
 
+// ---------- Types ----------
 interface Social { label: string; href: string; handle: string }
 interface LinkRef { label: string; href: string }
 interface Highlight { title: string; blurb: string; links: LinkRef[]; image: string }
 interface WorkItem { org: string; period: string; summary: string; highlights: Highlight[] }
 interface Degree { school: string; degree: string; year: string; blurb?: string; links?: LinkRef[] }
 
+// ---------- Content ----------
 const profile = {
   name: "Francisco Guzman",
   intro:
-    "I’m a product designer excited about emerging technologies, taking the complex and making it simple. At Instagram, I lead 0→1 initiatives in monetization and commerce and have managed designers as those programs scaled. Before that, I helped build early product at Nuro (autonomous delivery) and Instacart (on‑demand logistics).",
+    "At Instagram, I lead 0→1 initiatives in monetization and commerce and have managed designers as those programs scaled. Before that, I helped build early product at Nuro (autonomous delivery) and Instacart (on‑demand logistics).",
   socials: [
     { label: "LinkedIn", href: "https://www.linkedin.com/in/fguzman1/", handle: "" },
     { label: "Email", href: "mailto:francisco.guzman@me.com", handle: "" }
@@ -27,19 +28,37 @@ const profile = {
 const orgAvatars: Record<string, string> = {
   "Instagram (Meta)": "/images/instagram.jpg",
   Instacart: "/images/instacart.jpg",
-  Nuro: "/images/n.png",
+  Nuro: "/images/nuro.jpg",
   Prismatic: "/images/p.png",
   "Stanford University": "/images/s.jpg"
 };
 
-const educationImage = "/images/stanford.jpg";
-
-// Education data for full project-style cards (no image)
 const education: ReadonlyArray<Degree> = [
-  { school: "Stanford University", degree: "M.S. Symbolic Systems", year: "2013", blurb: undefined, links: [] },
-  { school: "Stanford University", degree: "B.S. Management Science & Engineering", year: "2012", blurb: undefined, links: [] }
+  {
+    school: "Stanford University",
+    degree: "M.S. Symbolic Systems",
+    year: "2013",
+    blurb:
+      "Focus on Human–Computer Interaction. Mayfield fellow. An interdisciplinary program at the intersection of computer science, psychology, linguistics, and philosophy.",
+    links: [
+      { label: "Symbolic Systems Program", href: "https://symsys.stanford.edu/" },
+      { label: "Mayfield Fellows Program", href: "https://stvp.stanford.edu/mayfield-fellows-program" }
+    ]
+  },
+  {
+    school: "Stanford University",
+    degree: "B.S. Management Science & Engineering",
+    year: "2012",
+    blurb:
+      "Honors in Science, Technology & Society. Industrial engineering degree with hints of computer science, operations research and economics.",
+    links: [
+      { label: "MS&E Program", href: "https://msande.stanford.edu/" },
+      { label: "Science, Technology & Society", href: "https://sts.stanford.edu/" }
+    ]
+  }
 ];
 
+// Re‑add Work items so the Work section renders
 const work: ReadonlyArray<WorkItem> = [
   {
     org: "Instagram (Meta)",
@@ -78,8 +97,8 @@ const work: ReadonlyArray<WorkItem> = [
         title: "Autonomous Delivery Ops & Consumer Flow",
         blurb:
           "Prototyped and launched early mobile experiences and remote‑ops tooling enabling safe, reliable driverless delivery.",
-        links: [{ label: "Nuro Press", href: "https://www.nuro.ai/press" }],
-        image: "/images/n.png"
+        links: [{ label: "Nuro Press", href: "https://www.nuro.ai/press" }],
+        image: "/images/nuro.jpg"
       }
     ]
   },
@@ -113,6 +132,7 @@ const work: ReadonlyArray<WorkItem> = [
   }
 ];
 
+// ---------- UI ----------
 function Divider() {
   return <hr className="my-8 sm:my-10 border-zinc-200/70 dark:border-zinc-800/70" />;
 }
@@ -136,15 +156,18 @@ function SocialRow({ socials }: { socials: ReadonlyArray<Social> }) {
 function ProjectCard({ item }: { item: { title: string; blurb?: string; links?: LinkRef[]; image?: string } }) {
   const hasImage = Boolean(item.image);
   return (
-    <div className={
-      "group grid gap-3 sm:gap-4 items-center rounded-2xl border border-zinc-200 dark:border-zinc-800 p-3 sm:p-4 " +
-      (hasImage ? "grid-cols-1 sm:grid-cols-[1fr_minmax(240px,40%)]" : "grid-cols-1")
-    }>
-      {/* Text */}
+    <div
+      className={
+        "group grid gap-3 sm:gap-4 items-center rounded-2xl border border-zinc-200 dark:border-zinc-800 p-3 sm:p-4 " +
+        (hasImage ? "grid-cols-1 sm:grid-cols-[1fr_minmax(240px,40%)]" : "grid-cols-1")
+      }
+    >
       <div className={hasImage ? "order-2 sm:order-1" : "order-1"}>
         <h4 className="font-semibold text-base sm:text-lg text-zinc-900 dark:text-zinc-100 mb-1.5">{item.title}</h4>
         {item.blurb && (
-          <p className="text-sm sm:text-[15px] leading-7 text-zinc-700 dark:text-zinc-300 mb-2 sm:mb-3 max-w-[68ch]">{item.blurb}</p>
+          <p className="text-sm sm:text-[15px] leading-7 text-zinc-700 dark:text-zinc-300 mb-2 sm:mb-3 max-w-[68ch]">
+            {item.blurb}
+          </p>
         )}
         {item.links && item.links.length > 0 && (
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
@@ -162,7 +185,6 @@ function ProjectCard({ item }: { item: { title: string; blurb?: string; links?: 
           </div>
         )}
       </div>
-      {/* Optional Image */}
       {hasImage && (
         <div className="order-1 sm:order-2">
           <img
@@ -176,21 +198,13 @@ function ProjectCard({ item }: { item: { title: string; blurb?: string; links?: 
   );
 }
 
-
 function EducationBlock() {
-  // Compute a compact year range like "2012 – 2013"
-  const years = education.map((d) => parseInt(d.year, 10)).filter((n) => !Number.isNaN(n));
-  const minYear = Math.min(...years);
-  const maxYear = Math.max(...years);
-  const range = Number.isFinite(minYear) && Number.isFinite(maxYear)
-    ? `${minYear} – ${maxYear}`
-    : "";
-
   return (
     <section id="education" className="scroll-mt-24">
-      <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-800 dark:text-zinc-100 mb-2 sm:mb-3">Education</h2>
+      <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-800 dark:text-zinc-100 mb-2 sm:mb-3">
+        Education
+      </h2>
 
-      {/* Employer-style header for Stanford */}
       <header className="grid grid-cols-[1fr,auto] items-start gap-2 sm:gap-3 mb-3 sm:mb-4">
         <h3 className="text-lg sm:text-xl font-semibold leading-6 sm:leading-7 text-zinc-900 dark:text-zinc-100 flex items-center gap-2 min-w-0">
           <img
@@ -200,12 +214,8 @@ function EducationBlock() {
           />
           <span className="truncate">Stanford University</span>
         </h3>
-        {range && (
-          <div className="text-sm sm:text-base text-zinc-500 text-right leading-6 sm:leading-7 pt-0.5 self-start">{range}</div>
-        )}
       </header>
 
-      {/* Degree cards reused from ProjectCard (no images initially) */}
       <div className="space-y-4 sm:space-y-5">
         {education.map((d) => (
           <ProjectCard key={`${d.degree}-${d.year}`} item={{ title: d.degree, blurb: d.blurb, links: d.links }} />
@@ -216,11 +226,14 @@ function EducationBlock() {
 }
 
 export default function PersonalSite() {
-  const sections = useMemo(() => [
-    { id: "overview", label: "overview" },
-    { id: "work", label: "work" },
-    { id: "education", label: "education" }
-  ], []);
+  const sections = useMemo(
+    () => [
+      { id: "overview", label: "overview" },
+      { id: "work", label: "work" },
+      { id: "education", label: "education" }
+    ],
+    []
+  );
 
   const [active, setActive] = useState("overview");
   const prefersReducedMotion = useRef(false);
@@ -231,7 +244,8 @@ export default function PersonalSite() {
     prefersReducedMotion.current = mq.matches;
 
     document.title = "Francisco Guzman — Product Designer";
-    const link = document.querySelector<HTMLLinkElement>('link[rel="icon"]') ?? document.createElement("link");
+    const link =
+      document.querySelector<HTMLLinkElement>('link[rel="icon"]') ?? document.createElement("link");
     link.rel = "icon";
     link.href = "/images/fav.png";
     link.type = "image/png";
@@ -241,20 +255,22 @@ export default function PersonalSite() {
   }, []);
 
   useEffect(() => {
-    // Prevent auto scroll to #work if loaded with hash
     if (window.location.hash === "#work") {
       history.replaceState(null, "", window.location.pathname);
     }
 
     const ids = sections.map((s) => s.id);
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) {
-        if (e.isIntersecting) {
-          const id = (e.target as HTMLElement).id;
-          if (ids.includes(id)) setActive(id);
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            const id = (e.target as HTMLElement).id;
+            if (ids.includes(id)) setActive(id);
+          }
         }
-      }
-    }, { rootMargin: "-40% 0px -55% 0px" });
+      },
+      { rootMargin: "-40% 0px -55% 0px" }
+    );
 
     ids.forEach((id) => {
       const el = document.getElementById(id);
@@ -273,7 +289,10 @@ export default function PersonalSite() {
   return (
     <main className="mx-auto max-w-3xl px-5 sm:px-6 py-6 sm:py-10 text-zinc-900 dark:text-zinc-100 leading-8 tracking-tight">
       <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-6 sm:pb-8">
-        <a href="#overview" className="font-medium tracking-tight text-zinc-900 dark:text-zinc-100 text-2xl sm:text-3xl">
+        <a
+          href="#overview"
+          className="font-medium tracking-tight text-zinc-900 dark:text-zinc-100 text-2xl sm:text-3xl"
+        >
           {profile.name}
         </a>
         <nav className="flex flex-wrap items-center gap-3 text-sm sm:text-base">
@@ -295,6 +314,7 @@ export default function PersonalSite() {
         </nav>
       </header>
 
+      {/* Overview */}
       <section id="overview" className="scroll-mt-24 space-y-4 sm:space-y-6">
         <p className="text-[17px] sm:text-[18px] leading-8 tracking-[-0.01em] text-zinc-800 dark:text-zinc-200 max-w-[68ch]">
           <span className="block font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
@@ -307,6 +327,7 @@ export default function PersonalSite() {
 
       <Divider />
 
+      {/* Work */}
       <section id="work" className="scroll-mt-24">
         <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-800 dark:text-zinc-100 mb-2 sm:mb-3">Work</h2>
         <div className="mt-4 sm:mt-6 space-y-8 sm:space-y-10">
@@ -342,8 +363,6 @@ export default function PersonalSite() {
       <Divider />
 
       <EducationBlock />
-
-      <footer className="mt-12 text-sm text-zinc-500">© {new Date().getFullYear()} {profile.name}</footer>
     </main>
   );
 }
