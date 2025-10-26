@@ -21,7 +21,7 @@ const profile = {
 };
 
 const orgAvatars: Record<string, string> = {
-  "Instagram": "/images/instagram.jpg",
+  "Instagram (Meta)": "/images/instagram.jpg",
   "Instacart": "/images/instacart.jpg",
   "Nuro": "/images/nuro.jpg",
   "Prismatic": "/images/prismatic.jpg"
@@ -31,7 +31,7 @@ const educationImage = "/images/stanford.jpg";
 
 const work = [
   {
-    org: "Instagram",
+    org: "Instagram (Meta)",
     period: "2020 – Present",
     summary:
       "Leading early monetization and commerce products across Instagram, shaping features that help creators and businesses grow sustainably.",
@@ -307,8 +307,3 @@ function SocialRow({ socials }: { socials: Array<{label: string; href: string; h
   );
 }
 
-// ---------- Dev sanity checks (non-blocking) ----------
-if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
-  console.assert(Array.isArray(profile.socials) && profile.socials.length > 0, 'Expected socials');
-  console.assert(work.length >= 1, 'Expected at least one work entry');
-}
