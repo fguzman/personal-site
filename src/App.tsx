@@ -21,7 +21,7 @@ const profile = {
 };
 
 const orgAvatars: Record<string, string> = {
-  "Instagram (Meta)": "/images/instagram.jpg",
+  "Instagram": "/images/instagram.jpg",
   "Instacart": "/images/instacart.jpg",
   "Nuro": "/images/nuro.jpg",
   "Prismatic": "/images/prismatic.jpg"
@@ -31,7 +31,7 @@ const educationImage = "/images/stanford.jpg";
 
 const work = [
   {
-    org: "Instagram (Meta)",
+    org: "Instagram",
     period: "2020 – Present",
     summary:
       "Leading early monetization and commerce products across Instagram, shaping features that help creators and businesses grow sustainably.",
