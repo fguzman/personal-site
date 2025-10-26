@@ -1,19 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-/**
- * App.tsx — Personal-site (Francisco Guzman)
- * ---------------------------------------------------------
- * • Mobile typography optimized for readability (inspired by clean, airy layouts)
- * • Larger base font, improved line height, balanced text width
- * • Single-paragraph overview with bold opening line; no em dashes
- * • Roles hidden in Work (company + period only)
- */
-
 // ---------- Content ----------
 const profile = {
   name: "Francisco Guzman",
   intro:
-    "I’m a product designer excited about emerging technologies, taking the complex and making it simple. At Instagram, I lead 0→1 initiatives in monetization and commerce, shaping products like Meta Verified and the broader suite of Shopping tools, and have managed designers growing these areas from incubation to scale. Before that, I helped build early product at Nuro (autonomous delivery) and Instacart (on-demand logistics). My background is in engineering and the social sciences, and how those areas intersect.",
+    "I’m a product designer excited about emerging technologies, taking the complex and making it simple. At Instagram, I lead 0→1 initiatives in monetization and commerce, shaping products like Meta Verified and the broader suite of Shopping tools, and have managed designers growing these areas from incubation to scale. Before that, I helped build early product at Nuro (autonomous delivery) and Instacart (on-demand logistics).",
   socials: [
     { label: "Threads", href: "https://www.threads.net/@fguzman", handle: "@fguzman" },
     { label: "LinkedIn", href: "https://www.linkedin.com/in/fguzman1/", handle: "linkedin.com/in/fguzman1/" },
@@ -35,12 +26,12 @@ const work = [
     org: "Instagram (Meta)",
     period: "2020 – Present",
     summary:
-      "Leading early monetization and commerce products across Instagram, shaping features that help creators and businesses grow sustainably.",
+      "Incubating new monetization and commerce bets across Instagram.",
     highlights: [
       {
         title: "Meta Verified on Instagram",
         blurb:
-          "Subscription that provides creators and businesses with credibility signals and support.",
+          "Meta's first scaled subscription product. Led end-to-end design for Instagram experience across creators and businesses.",
         links: [
           { label: "Meta Verified (overview)", href: "https://www.meta.com/meta-verified/" },
           { label: "Help Center", href: "https://help.instagram.com/738055111270671" }
@@ -51,7 +42,7 @@ const work = [
       {
         title: "Instagram Shopping Ecosystem",
         blurb:
-          "Simplifying product discovery and purchase across Shops, Checkout, and Reels contexts.",
+          "Have worked on a wide range of commerce initiatives, including consumer experience across Reels, Stories and Feed, as well as seller and creator setup and shop managemenent.",
         links: [
           {
             label: "Instagram Shop",
@@ -75,7 +66,7 @@ const work = [
     org: "Nuro",
     period: "2018 – 2019",
     summary:
-      "First design hire building early consumer and operator experiences for autonomous delivery.",
+      "First product design hire building early consumer and operator experiences for autonomous delivery.",
     highlights: [
       {
         title: "Autonomous Delivery Ops & Consumer Flow",
@@ -91,12 +82,12 @@ const work = [
     org: "Instacart",
     period: "2015 – 2018",
     summary:
-      "Second design hire driving logistics and fulfillment tools that scaled shopper operations.",
+      "Second product design hire and lead for all shopper and driver experiences.",
     highlights: [
       {
-        title: "Fulfillment & Operations",
+        title: "Fulfillment & Operations design",
         blurb:
-          "Improving navigation, scheduling, and pay systems to increase reliability and efficiency for shoppers.",
+          "Improving in-store navigation, scheduling, and pay systems to increase reliability and efficiency for shoppers and drivers.",
         links: [{ label: "Instacart", href: "https://www.instacart.com" }],
         image:
           "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=1600&auto=format&fit=crop"
@@ -107,13 +98,13 @@ const work = [
     org: "Prismatic",
     period: "2013 – 2015",
     summary:
-      "Designed interaction models for personalized news discovery balancing control and serendipity.",
+      "Early member of the team working on interaction and social design",
     highlights: [
       {
         title: "Discovery & Feed Interaction Model",
         blurb:
-          "Explored ranking signals and feed controls to make personalization feel intuitive.",
-        links: [{ label: "Prismatic (Wikipedia)", href: "https://en.wikipedia.org/wiki/Prismatic_(app)" }],
+          "",
+        links: [{ label: "Teehan & Lax", href: "https://teehanlax.com/story/prismatic/" }],
         image:
           "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1600&auto=format&fit=crop"
       }
