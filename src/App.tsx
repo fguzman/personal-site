@@ -3,8 +3,9 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 /**
  * App.tsx — Personal-site (Francisco Guzman)
  * ---------------------------------------------------------
- * • Single-page layout with in-page sections: Overview, Projects, Resume
+ * • Single-page layout with in-page sections: Overview, Projects, Experience
  * • Header: left identity; right local nav (active state via IntersectionObserver)
+ * • Defaults to Overview section on load
  * • Smooth scroll, hash updates, scroll-margin for anchors
  * • Consistent typography & spacing on mobile/desktop
  * • Socials sanitized to avoid React #130 errors
@@ -63,8 +64,8 @@ const projects = [
   }
 ];
 
-const resume = {
-  experience: [
+const experience = {
+  roles: [
     { org: "Instagram (Meta)", role: "Senior Staff Product Designer", period: "2020 – Present", overview: "Leads 0→1 monetization bets (including Meta Verified), large‑scale Reels commerce experiments, and the first consumer‑facing AI business agent experiences on Instagram." },
     { org: "Nuro", role: "Founding Product Designer", period: "2018 – 2019", overview: "First designer building consumer, operator, and internal tools for driverless delivery, including mobile apps and remote ops systems." },
     { org: "Instacart", role: "Lead Product Designer", period: "2015 – 2018", overview: "Second design hire leading fulfillment and logistics products (in‑store navigation, order changes, scheduling/pay) to scale operations." },
@@ -76,27 +77,23 @@ const resume = {
   ]
 };
 
-// ---------- Helpers ----------
 function isString(v: unknown): v is string { return typeof v === 'string'; }
 function sanitizeSocials(input: any): Array<{label: string; href: string; handle: string}> {
   if (!Array.isArray(input)) return [];
-  return input
-    .filter((s) => s && isString(s.label) && isString(s.href) && isString(s.handle))
-    .map((s) => ({ label: String(s.label), href: String(s.href), handle: String(s.handle) }));
+  return input.filter((s) => s && isString(s.label) && isString(s.href) && isString(s.handle)).map((s) => ({ label: String(s.label), href: String(s.href), handle: String(s.handle) }));
 }
 const safeSocials = sanitizeSocials(profile.socials);
 
-// ---------- Single‑page App ----------
 export default function PersonalSite() {
   const sections = useMemo(() => ([
     { id: 'overview', label: 'Overview' },
     { id: 'projects', label: 'Projects' },
-    { id: 'experience', label: 'Experience' },
+    { id: 'experience', label: 'Experience' }
   ]), []);
 
   const [active, setActive] = useState('overview');
 
-  // IntersectionObserver to track active section
+  // IntersectionObserver
   useEffect(() => {
     const ids = sections.map(s => s.id);
     const opts: IntersectionObserverInit = { rootMargin: '-40% 0px -55% 0px', threshold: [0, 1] };
@@ -119,18 +116,22 @@ export default function PersonalSite() {
     return () => io.disconnect();
   }, [sections]);
 
-  // Smooth scroll for header nav
+  useEffect(() => {
+    // Default to overview if no hash
+    if (!window.location.hash) {
+      setActive('overview');
+      history.replaceState(null, '', '#overview');
+    }
+  }, []);
+
   const onNavClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
     const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   return (
     <main className="mx-auto max-w-3xl px-5 sm:px-6 py-8 sm:py-12 text-zinc-900 dark:text-zinc-100">
-      {/* Header */}
       <header className="flex items-center justify-between pb-6">
         <a href="#overview" className="font-medium tracking-tight text-zinc-900 dark:text-zinc-100 text-xl sm:text-2xl">{profile.name}</a>
         <nav className="flex items-center gap-4 text-sm">
@@ -153,22 +154,17 @@ export default function PersonalSite() {
         </nav>
       </header>
 
-      {/* Overview */}
       <section id="overview" className="scroll-mt-24 space-y-4">
-        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 leading-snug">
-          {profile.intro}
-        </h1>
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 leading-snug">{profile.intro}</h1>
       </section>
 
       <Divider />
 
-      {/* Projects */}
       <section id="projects" className="scroll-mt-24">
         <h2 className="text-xl sm:text-[22px] font-semibold tracking-tight text-zinc-800 dark:text-zinc-100">Selected Projects</h2>
         <div className="mt-6 space-y-10">
           {projects.map((p, idx) => (
             <article key={p.title} className="grid gap-4 sm:grid-cols-[1fr_16rem] sm:gap-6">
-              {/* Text column */}
               <div className={idx % 2 === 1 ? 'sm:order-2' : ''}>
                 <h3 className="font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
                   <span className="mr-2">{p.title}</span>
@@ -186,7 +182,6 @@ export default function PersonalSite() {
                   ))}
                 </div>
               </div>
-              {/* Image column */}
               <figure className={idx % 2 === 1 ? 'sm:order-1' : ''}>
                 <img
                   src={p.image}
@@ -205,11 +200,10 @@ export default function PersonalSite() {
 
       <Divider />
 
-      {/* Resume */}
       <section id="experience" className="scroll-mt-24">
         <h2 className="text-lg sm:text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Experience</h2>
         <ul className="mt-4 space-y-6">
-          {resume.experience.map((e) => (
+          {experience.roles.map((e) => (
             <li key={e.org + e.role}>
               <div className="flex items-baseline justify-between gap-4">
                 <div>
@@ -226,7 +220,7 @@ export default function PersonalSite() {
 
         <h2 className="text-lg sm:text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Education</h2>
         <ul className="mt-3 space-y-3">
-          {resume.education.map((ed) => (
+          {experience.education.map((ed) => (
             <li key={ed.school + ed.period}>
               <div className="font-medium tracking-tight text-zinc-900 dark:text-zinc-100">{ed.school}</div>
               <div className="text-sm sm:text-base text-zinc-700 dark:text-zinc-300">{ed.degree}</div>
@@ -238,7 +232,6 @@ export default function PersonalSite() {
 
       <Divider />
 
-      {/* Footer links */}
       <footer className="pt-6 sm:pt-8 text-sm text-zinc-500 dark:text-zinc-400">
         <ul className="space-y-3">
           {safeSocials.map((s) => (
