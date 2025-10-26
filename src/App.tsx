@@ -1,33 +1,27 @@
-import React, { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 /**
- * Francisco Guzman — Personal Site
+ * App.tsx — Personal-site (Francisco Guzman)
  * ---------------------------------------------------------
- * • Minimal landing: name + short blurb
- * • Home shows Selected Projects (no images) and footer links
- * • Resume page (#resume): company, role, years, one‑line overview, education
- * • Balanced spacing/contrast; accessible nav
- * • Added: animated view transitions (cross‑fade + slight slide),
- *          reduced‑motion friendly, active pill nav for Resume,
- *          scroll position restore when returning home.
+ * • Single-page layout with in-page sections: Overview, Projects, Resume
+ * • Header: left identity; right local nav (active state via IntersectionObserver)
+ * • Smooth scroll, hash updates, scroll-margin for anchors
+ * • Consistent typography & spacing on mobile/desktop
+ * • Socials sanitized to avoid React #130 errors
  */
 
+// ---------- Content ----------
 const profile = {
   name: "Francisco Guzman",
-  tagline:
-    "I'm a product designer with a strong interest in the social sciences and music. I enjoy creating simplicity out of the complex.",
-  blurb:
-    "I work at Instagram as a product design lead, driving 0→1 initiatives in monetization and emerging technology. Before that, I helped build and scale products at several startups including Nuro and Instacart.",
+  intro:
+    "I'm a product designer with a strong interest in the social sciences and music. I enjoy creating simplicity out of the complex. I lead 0→1 initiatives at Instagram and previously worked at startups like Nuro and Instacart.",
   socials: [
     { label: "Threads", href: "https://www.threads.com/@fguzman", handle: "@fguzman" },
     { label: "LinkedIn", href: "https://www.linkedin.com/in/fguzman1/", handle: "linkedin.com/in/fguzman1/" },
-    { label: "Email", href: "mailto:francisco@example.com", handle: "francisco@example.com" },
-  ],
-  resumeUrl: "#resume",
+    { label: "Email", href: "mailto:francisco@example.com", handle: "francisco@example.com" }
+  ]
 };
 
-// ---- Selected Projects (no images) ----
 const projects = [
   {
     title: "Meta Verified on Instagram",
@@ -37,8 +31,9 @@ const projects = [
       "Helped lead design for Meta Verified on Instagram — a subscription for creators and businesses to build credibility and receive support.",
     links: [
       { label: "Meta Blog Announcement", href: "https://about.meta.com/news/2023/02/testing-meta-verified-to-help-creators/" },
-      { label: "Instagram Blog", href: "https://about.instagram.com/blog/announcements/meta-verified" },
+      { label: "Instagram Blog", href: "https://about.instagram.com/blog/announcements/meta-verified" }
     ],
+    image: "https://images.unsplash.com/photo-1553532438-d163f5dfb36e?q=80&w=1600&auto=format&fit=crop"
   },
   {
     title: "Instagram Shopping Ecosystem",
@@ -49,8 +44,9 @@ const projects = [
     links: [
       { label: "Introducing Shops on Instagram", href: "https://about.instagram.com/blog/announcements/introducing-shops-on-instagram" },
       { label: "Checkout on Instagram", href: "https://about.instagram.com/blog/announcements/checkout-on-instagram" },
-      { label: "Shopping in Reels", href: "https://about.instagram.com/blog/announcements/shopping-in-reels" },
+      { label: "Shopping in Reels", href: "https://about.instagram.com/blog/announcements/shopping-in-reels" }
     ],
+    image: "https://images.unsplash.com/photo-1520975922215-230f283c0f48?q=80&w=1600&auto=format&fit=crop"
   },
   {
     title: "Early Startup Years: Instacart, Nuro, Prismatic",
@@ -61,218 +57,199 @@ const projects = [
     links: [
       { label: "Instacart", href: "https://www.instacart.com" },
       { label: "Nuro", href: "https://www.nuro.ai" },
-      { label: "Prismatic", href: "https://techcrunch.com/2015/12/21/prismatic-news-feed/" },
+      { label: "Prismatic", href: "https://techcrunch.com/2015/12/21/prismatic-news-feed/" }
     ],
-  },
+    image: "https://images.unsplash.com/photo-1599058917212-d750089bc07e?q=80&w=1600&auto=format&fit=crop"
+  }
 ];
 
-// ---- Resume (high‑level summary) ----
 const resume = {
   experience: [
-    {
-      org: "Instagram (Meta)",
-      role: "Senior Staff Product Designer",
-      period: "2020 – Present",
-      overview:
-        "Leads 0→1 monetization bets (including Meta Verified), large‑scale Reels commerce experiments, and the first consumer‑facing AI business agent experiences on Instagram.",
-    },
-    {
-      org: "Nuro",
-      role: "Founding Product Designer",
-      period: "2018 – 2019",
-      overview:
-        "First designer building consumer, operator, and internal tools for driverless delivery, including mobile apps and remote ops systems.",
-    },
-    {
-      org: "Instacart",
-      role: "Lead Product Designer",
-      period: "2015 – 2018",
-      overview:
-        "Second design hire leading fulfillment and logistics products (in‑store navigation, order changes, scheduling/pay) to scale operations.",
-    },
-    {
-      org: "Prismatic",
-      role: "Interaction Designer",
-      period: "2013 – 2015",
-      overview:
-        "Designed core interaction patterns for personalized news discovery across mobile and web, collaborating closely with founders on product direction.",
-    },
+    { org: "Instagram (Meta)", role: "Senior Staff Product Designer", period: "2020 – Present", overview: "Leads 0→1 monetization bets (including Meta Verified), large‑scale Reels commerce experiments, and the first consumer‑facing AI business agent experiences on Instagram." },
+    { org: "Nuro", role: "Founding Product Designer", period: "2018 – 2019", overview: "First designer building consumer, operator, and internal tools for driverless delivery, including mobile apps and remote ops systems." },
+    { org: "Instacart", role: "Lead Product Designer", period: "2015 – 2018", overview: "Second design hire leading fulfillment and logistics products (in‑store navigation, order changes, scheduling/pay) to scale operations." },
+    { org: "Prismatic", role: "Interaction Designer", period: "2013 – 2015", overview: "Designed core interaction patterns for personalized news discovery across mobile and web, collaborating closely with founders on product direction." }
   ],
   education: [
     { school: "Stanford University", degree: "M.S. Symbolic Systems", period: "2013" },
-    { school: "Stanford University", degree: "B.S. Management Science & Engineering", period: "2012" },
-  ],
+    { school: "Stanford University", degree: "B.S. Management Science & Engineering", period: "2012" }
+  ]
 };
 
-export default function PersonalSite() {
-  const [view, setView] = useState<'home' | 'resume'>('home');
-  const prefersReducedMotion = useReducedMotion();
-  const homeScrollRef = useRef(0);
+// ---------- Helpers ----------
+function isString(v: unknown): v is string { return typeof v === 'string'; }
+function sanitizeSocials(input: any): Array<{label: string; href: string; handle: string}> {
+  if (!Array.isArray(input)) return [];
+  return input
+    .filter((s) => s && isString(s.label) && isString(s.href) && isString(s.handle))
+    .map((s) => ({ label: String(s.label), href: String(s.href), handle: String(s.handle) }));
+}
+const safeSocials = sanitizeSocials(profile.socials);
 
-  // Hash routing + scroll restore
+// ---------- Single‑page App ----------
+export default function PersonalSite() {
+  const sections = useMemo(() => ([
+    { id: 'overview', label: 'Overview' },
+    { id: 'projects', label: 'Projects' },
+    { id: 'experience', label: 'Experience' },
+  ]), []);
+
+  const [active, setActive] = useState('overview');
+
+  // IntersectionObserver to track active section
   useEffect(() => {
-    const onHash = () => {
-      const nextIsResume = window.location.hash === '#resume';
-      if (nextIsResume) {
-        // store home scroll and go to top for resume
-        homeScrollRef.current = window.scrollY;
-        setView('resume');
-        window.scrollTo({ top: 0, behavior: 'instant' as any });
-      } else {
-        setView('home');
-        // restore prior position
-        window.requestAnimationFrame(() => {
-          window.scrollTo({ top: homeScrollRef.current, behavior: 'instant' as any });
-        });
+    const ids = sections.map(s => s.id);
+    const opts: IntersectionObserverInit = { rootMargin: '-40% 0px -55% 0px', threshold: [0, 1] };
+    const handler = (entries: IntersectionObserverEntry[]) => {
+      for (const e of entries) {
+        if (e.isIntersecting) {
+          const id = (e.target as HTMLElement).id;
+          if (ids.includes(id)) {
+            setActive(id);
+            history.replaceState(null, '', `#${id}`);
+          }
+        }
       }
     };
-    onHash();
-    window.addEventListener('hashchange', onHash);
-    return () => window.removeEventListener('hashchange', onHash);
-  }, []);
+    const io = new IntersectionObserver(handler, opts);
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) io.observe(el);
+    });
+    return () => io.disconnect();
+  }, [sections]);
 
-  // Shared header with active pill nav
-  const Header: React.FC = () => {
-    const isResume = view === 'resume';
-    return (
-      <header className="flex items-center justify-between pb-6">
-        <a href="#top" className="font-medium tracking-tight text-zinc-700 dark:text-zinc-200 text-xl sm:text-2xl">{profile.name}</a>
-        <nav className="flex items-center gap-3 text-sm">
-          <a
-            href={profile.resumeUrl}
-            aria-current={isResume ? 'page' : undefined}
-            className={[
-              'inline-flex items-center rounded-full border px-3 py-1 focus:outline-none focus-visible:ring-2',
-              isResume
-                ? 'border-zinc-300 text-zinc-900 dark:text-zinc-100 dark:border-zinc-600 bg-zinc-100 dark:bg-zinc-800'
-                : 'border-zinc-300 text-zinc-600 dark:text-zinc-300 dark:border-zinc-600 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/60'
-            ].join(' ')}
-          >
-            resume
-          </a>
-        </nav>
-      </header>
-    );
+  // Smooth scroll for header nav
+  const onNavClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
-  const spring = { duration: prefersReducedMotion ? 0 : 0.22, ease: 'easeOut' as const };
-
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      {view === 'home' ? (
-        <motion.main
-          key="home"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={spring}
-          className="mx-auto max-w-3xl px-5 sm:px-6 py-8 sm:py-12 text-zinc-900 dark:text-zinc-100"
-        >
-          <Header />
+    <main className="mx-auto max-w-3xl px-5 sm:px-6 py-8 sm:py-12 text-zinc-900 dark:text-zinc-100">
+      {/* Header */}
+      <header className="flex items-center justify-between pb-6">
+        <a href="#overview" className="font-medium tracking-tight text-zinc-900 dark:text-zinc-100 text-xl sm:text-2xl">{profile.name}</a>
+        <nav className="flex items-center gap-4 text-sm">
+          {sections.map(s => (
+            <a
+              key={s.id}
+              href={`#${s.id}`}
+              onClick={(e) => onNavClick(e, s.id)}
+              aria-current={active === s.id ? 'page' : undefined}
+              className={[
+                'inline-flex items-center rounded-full px-3 py-1 focus:outline-none focus-visible:ring-2',
+                active === s.id
+                  ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
+                  : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/60'
+              ].join(' ')}
+            >
+              {s.label.toLowerCase()}
+            </a>
+          ))}
+        </nav>
+      </header>
 
-          {/* Landing */}
-          <section id="top" className="space-y-4">
-            <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 leading-snug">{profile.tagline}</h1>
-            <p className="text-base sm:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">{profile.blurb}</p>
-          </section>
+      {/* Overview */}
+      <section id="overview" className="scroll-mt-24 space-y-4">
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 leading-snug">
+          {profile.intro}
+        </h1>
+      </section>
 
-          <Divider />
+      <Divider />
 
-          {/* Selected Projects (no images) */}
-          <section id="projects" className="scroll-mt-24">
-            <h2 className="text-xl sm:text-[22px] font-semibold tracking-tight text-zinc-800 dark:text-zinc-100">Selected Projects</h2>
-            <div className="mt-6 space-y-10">
-              {projects.map((p) => (
-                <article key={p.title} className="space-y-3 sm:space-y-4 max-w-prose">
-                  <h3 className="font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
-                    <span className="mr-2">{p.title}</span>
-                    <span className="text-zinc-400">{p.date}</span>
-                  </h3>
-                  <ul className="flex flex-wrap gap-2 text-xs text-zinc-600 dark:text-zinc-300">
-                    {p.tags.map((t) => (
-                      <li key={t} className="rounded-full border border-zinc-200 px-2 py-0.5 dark:border-zinc-600">{t}</li>
-                    ))}
-                  </ul>
-                  <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-300">{p.blurb}</p>
-                  <div className="flex flex-wrap gap-4 text-sm">
-                    {p.links.map((l) => (
-                      <a key={l.label} href={l.href} className="underline underline-offset-4 hover:no-underline">{l.label}</a>
-                    ))}
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
+      {/* Projects */}
+      <section id="projects" className="scroll-mt-24">
+        <h2 className="text-xl sm:text-[22px] font-semibold tracking-tight text-zinc-800 dark:text-zinc-100">Selected Projects</h2>
+        <div className="mt-6 space-y-10">
+          {projects.map((p, idx) => (
+            <article key={p.title} className="grid gap-4 sm:grid-cols-[1fr_16rem] sm:gap-6">
+              {/* Text column */}
+              <div className={idx % 2 === 1 ? 'sm:order-2' : ''}>
+                <h3 className="font-medium tracking-tight text-zinc-900 dark:text-zinc-100">
+                  <span className="mr-2">{p.title}</span>
+                  <span className="text-zinc-400">{p.date}</span>
+                </h3>
+                <ul className="mt-2 flex flex-wrap gap-2 text-xs text-zinc-600 dark:text-zinc-300">
+                  {p.tags.map((t) => (
+                    <li key={t} className="rounded-full border border-zinc-200 px-2 py-0.5 dark:border-zinc-600">{t}</li>
+                  ))}
+                </ul>
+                <p className="mt-3 text-base leading-relaxed text-zinc-700 dark:text-zinc-300">{p.blurb}</p>
+                <div className="mt-3 flex flex-wrap gap-4 text-sm">
+                  {p.links.map((l) => (
+                    <a key={l.label} href={l.href} className="underline underline-offset-4 hover:no-underline">{l.label}</a>
+                  ))}
+                </div>
+              </div>
+              {/* Image column */}
+              <figure className={idx % 2 === 1 ? 'sm:order-1' : ''}>
+                <img
+                  src={p.image}
+                  alt={p.title}
+                  loading="lazy"
+                  decoding="async"
+                  width={1600}
+                  height={1000}
+                  className="w-full aspect-[4/3] sm:aspect-[16/10] object-cover rounded-xl ring-1 ring-black/5 dark:ring-white/10"
+                />
+              </figure>
+            </article>
+          ))}
+        </div>
+      </section>
 
-          <Divider />
+      <Divider />
 
-          {/* Footer links */}
-          <footer className="pt-6 sm:pt-8 text-sm text-zinc-500 dark:text-zinc-400">
-            <ul className="space-y-3">
-              {profile.socials.map((s) => (
-                <li key={s.label} className="flex justify-between border-b border-dotted border-zinc-300 dark:border-zinc-700 pb-1">
-                  <span className="text-zinc-700 dark:text-zinc-300">{s.label}</span>
-                  <a href={s.href} className="text-zinc-800 dark:text-zinc-200 hover:underline">{s.handle}</a>
-                </li>
-              ))}
-            </ul>
-          </footer>
-        </motion.main>
-      ) : (
-        <motion.main
-          key="resume"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={spring}
-          className="mx-auto max-w-3xl px-5 sm:px-6 py-8 sm:py-12 text-zinc-900 dark:text-zinc-100"
-        >
-          <Header />
+      {/* Resume */}
+      <section id="experience" className="scroll-mt-24">
+        <h2 className="text-lg sm:text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Experience</h2>
+        <ul className="mt-4 space-y-6">
+          {resume.experience.map((e) => (
+            <li key={e.org + e.role}>
+              <div className="flex items-baseline justify-between gap-4">
+                <div>
+                  <div className="font-medium tracking-tight text-zinc-900 dark:text-zinc-100">{e.role} · {e.org}</div>
+                </div>
+                <div className="text-sm text-zinc-400">{e.period}</div>
+              </div>
+              <p className="mt-1 text-base leading-relaxed text-zinc-700 dark:text-zinc-300">{e.overview}</p>
+            </li>
+          ))}
+        </ul>
 
-          <header className="flex items-start justify-between gap-6 pb-6">
-            <div>
-              <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">{profile.name}</h1>
-              <p className="mt-2 max-w-prose text-base sm:text-lg leading-relaxed text-zinc-700 dark:text-zinc-300">A selection of high‑level roles and education.</p>
-            </div>
-            <div className="flex flex-col items-end gap-2">
-              <a href="#top" className="text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-200">← home</a>
-            </div>
-          </header>
+        <Divider />
 
-          <section className="space-y-6">
-            <h2 className="text-lg sm:text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Experience</h2>
-            <ul className="space-y-6">
-              {resume.experience.map((e) => (
-                <li key={e.org + e.role}>
-                  <div className="flex items-baseline justify-between gap-4">
-                    <div>
-                      <div className="font-medium tracking-tight text-zinc-900 dark:text-zinc-100">{e.role} · {e.org}</div>
-                    </div>
-                    <div className="text-sm text-zinc-400">{e.period}</div>
-                  </div>
-                  <p className="mt-1 text-base leading-relaxed text-zinc-700 dark:text-zinc-300">{e.overview}</p>
-                </li>
-              ))}
-            </ul>
-          </section>
+        <h2 className="text-lg sm:text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Education</h2>
+        <ul className="mt-3 space-y-3">
+          {resume.education.map((ed) => (
+            <li key={ed.school + ed.period}>
+              <div className="font-medium tracking-tight text-zinc-900 dark:text-zinc-100">{ed.school}</div>
+              <div className="text-sm sm:text-base text-zinc-700 dark:text-zinc-300">{ed.degree}</div>
+              <div className="text-sm text-zinc-400">{ed.period}</div>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-          <Divider />
+      <Divider />
 
-          <section>
-            <h2 className="text-lg sm:text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Education</h2>
-            <ul className="mt-3 space-y-3">
-              {resume.education.map((ed) => (
-                <li key={ed.school + ed.period}>
-                  <div className="font-medium tracking-tight text-zinc-900 dark:text-zinc-100">{ed.school}</div>
-                  <div className="text-sm sm:text-base text-zinc-700 dark:text-zinc-300">{ed.degree}</div>
-                  <div className="text-sm text-zinc-400">{ed.period}</div>
-                </li>
-              ))}
-            </ul>
-          </section>
-        </motion.main>
-      )}
-    </AnimatePresence>
+      {/* Footer links */}
+      <footer className="pt-6 sm:pt-8 text-sm text-zinc-500 dark:text-zinc-400">
+        <ul className="space-y-3">
+          {safeSocials.map((s) => (
+            <li key={s.label} className="flex justify-between border-b border-dotted border-zinc-300 dark:border-zinc-700 pb-1">
+              <span className="text-zinc-700 dark:text-zinc-300">{s.label}</span>
+              <a href={s.href} className="text-zinc-800 dark:text-zinc-200 hover:underline">{s.handle}</a>
+            </li>
+          ))}
+        </ul>
+      </footer>
+    </main>
   );
 }
 
