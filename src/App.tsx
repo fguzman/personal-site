@@ -7,9 +7,9 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
  * • Single‑paragraph overview with bold lead‑in
  * • Two‑column company/date header for perfect alignment
  * • Highlight cards: image on top (mobile), image right + text left on ≥sm to reduce vertical height
- * • Social pills (LinkedIn & Email only), no secondary handles on desktop
- * • Sets page title and favicon (expects /public/favicon.svg)
- * • Dev‑safe: no Node globals in browser bundle; mild runtime data validation in dev
+ * • Links inside cards are black, underlined, laid out inline with wrap
+ * • Social links simplified (LinkedIn & Email)
+ * • Sets page title and favicon (uses /public/images/fav.png)
  */
 
 // ---------- Types ----------
@@ -60,7 +60,7 @@ const work: ReadonlyArray<WorkItem> = [
           "Worked across consumer shopping in Reels, Stories, and Feed, plus seller onboarding and shop management.",
         links: [
           { label: "Instagram Shop",          href: "https://about.instagram.com/blog/announcements/instagram-shop" },
-          { label: "Checkout on Instagram",   href: "https://www.instagram.com/beta_redirect?u=https%3A%2F%2Fabout.instagram.com%2Fblog%2Fannouncements%2Fintroducing-instagram-checkout" },
+          { label: "Checkout on Instagram",   href: "https://about.instagram.com/blog/announcements/introducing-instagram-checkout" },
           { label: "Reels & Shop tabs",       href: "https://about.instagram.com/blog/indus/introducing-reels-on-instagram-and-new-shopping" }
         ],
         image: "/images/ig.png"
@@ -91,7 +91,7 @@ const work: ReadonlyArray<WorkItem> = [
         blurb:
           "Improved in‑store navigation, order change flows, and scheduling & pay systems to reduce friction and boost throughput.",
         links: [ { label: "Instacart", href: "https://www.instacart.com" } ],
-        image: "/images/i.png"
+        image: "/images/instacart.jpg"
       }
     ]
   },
@@ -136,28 +136,17 @@ function Divider() {
 
 function SocialRow({ socials }: { socials: Social[] }) {
   return (
-    <div className="flex flex-wrap gap-3">
+    <div className="flex flex-wrap gap-4 text-sm">
       {socials.map((s) => (
         <a
           key={s.label}
           href={s.href}
-          className="inline-flex items-center gap-2 rounded-full border border-zinc-200 dark:border-zinc-700 px-3 py-1.5 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800/60"
+          className="underline decoration-zinc-400/70 underline-offset-2 text-zinc-900 dark:text-zinc-100 hover:decoration-zinc-800 dark:hover:decoration-zinc-200"
         >
-          <span className="font-medium">{s.label}</span>
+          {s.label}
         </a>
       ))}
     </div>
-  );
-}
-
-function LinkPill({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <a
-      href={href}
-      className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800/60"
-    >
-      {children}
-    </a>
   );
 }
 
@@ -168,9 +157,17 @@ function HighlightCard({ h }: { h: Highlight }) {
       <div className="order-2 sm:order-1">
         <h4 className="font-semibold text-base sm:text-lg text-zinc-900 dark:text-zinc-100 mb-1.5">{h.title}</h4>
         <p className="text-sm sm:text-[15px] leading-7 text-zinc-700 dark:text-zinc-300 mb-2 sm:mb-3 max-w-[68ch]">{h.blurb}</p>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
           {h.links?.map((l) => (
-            <LinkPill key={l.href} href={l.href}>{l.label}</LinkPill>
+            <a
+              key={l.href}
+              href={l.href}
+              className="underline decoration-zinc-400/70 underline-offset-2 text-zinc-900 dark:text-zinc-100 hover:decoration-zinc-800 dark:hover:decoration-zinc-200"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {l.label}
+            </a>
           ))}
         </div>
       </div>
@@ -224,7 +221,7 @@ export default function PersonalSite() {
     document.title = "Francisco Guzman — Product Designer";
     const ensureFavicon = () => {
       let link = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
-      const href = "/favicon.svg"; // place this file under /public
+      const href = "/images/fav.png"; // place this file under /public
       if (link) {
         link.href = href;
       } else {
