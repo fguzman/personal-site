@@ -217,6 +217,8 @@ export default function PersonalSite() {
           <h1 id="overview-title" className="text-[22px] sm:text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 leading-snug">
             {profile.intro}
           </h1>
+          {/* Contact pills inline under overview */}
+          <SocialRow socials={safeSocials} />
         </section>
 
         <Divider />
@@ -251,7 +253,7 @@ export default function PersonalSite() {
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <div className="space-y-1.5 sm:space-y-2">
+                      <div className="space-y-1.5 sm:space-y-2 min-w-0">
                         <h4 className="text-[15px] sm:text-base font-medium tracking-tight text-zinc-900 dark:text-zinc-100">{h.title}</h4>
                         <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">{h.blurb}</p>
                         <div className="flex flex-wrap gap-3 sm:gap-4 text-sm pt-0.5">
@@ -294,20 +296,6 @@ export default function PersonalSite() {
             </section>
           </article>
         </section>
-
-        <Divider />
-
-        {/* Footer links */}
-        <footer className="pt-5 sm:pt-8 text-sm text-zinc-500 dark:text-zinc-400" aria-label="Footer">
-          <ul className="space-y-2.5 sm:space-y-3">
-            {safeSocials.map((s) => (
-              <li key={s.label} className="flex justify-between border-b border-dotted border-zinc-300 dark:border-zinc-700 pb-1">
-                <span className="text-zinc-700 dark:text-zinc-300">{s.label}</span>
-                <SafeLink href={s.href} className="text-zinc-800 dark:text-zinc-200 hover:underline">{s.handle}</SafeLink>
-              </li>
-            ))}
-          </ul>
-        </footer>
       </main>
     </>
   );
@@ -355,3 +343,22 @@ function OrgBadgeAdvanced({ org }: { org: string }) {
     </span>
   );
 }
+
+function SocialRow({ socials }: { socials: Array<{label: string; href: string; handle: string}> }) {
+  if (!socials?.length) return null;
+  return (
+    <div className="flex flex-wrap gap-2 pt-1" aria-label="Contact links">
+      {socials.map((s) => (
+        <SafeLink
+          key={s.label}
+          href={s.href}
+          className="inline-flex items-center gap-1 rounded-full border border-zinc-300/60 dark:border-zinc-700/60 px-2.5 py-1 sm:px-3 text-sm hover:bg-zinc-100/60 dark:hover:bg-zinc-800/60 whitespace-nowrap"
+        >
+          <span className="font-medium text-zinc-800 dark:text-zinc-100">{s.label}</span>
+          <span className="hidden sm:inline text-zinc-500 dark:text-zinc-400">{s.handle}</span>
+        </SafeLink>
+      ))}
+    </div>
+  );
+}
+
