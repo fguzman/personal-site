@@ -1,5 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
+/**
+ * App.tsx — Personal-site (Francisco Guzman)
+ * ---------------------------------------------------------
+ * • Mobile typography optimized for readability (inspired by clean, airy layouts)
+ * • Larger base font, improved line height, balanced text width
+ * • Single-paragraph overview with bold opening line; no em dashes
+ * • Roles hidden in Work (company + period only)
+ */
+
 // ---------- Content ----------
 const profile = {
   name: "Francisco Guzman",
@@ -37,12 +46,12 @@ const work = [
           { label: "Help Center", href: "https://help.instagram.com/738055111270671" }
         ],
         image:
-          "https://images.unsplash.com/photo-1553532438-d163f5dfb36e?q=80&w=1600&auto=format&fit=crop"
+          "/images/mv.png"
       },
       {
         title: "Instagram Shopping Ecosystem",
         blurb:
-          "Have worked on a wide range of commerce initiatives, including consumer experience across Reels, Stories and Feed, as well as seller and creator setup and shop managemenent.",
+          "Have worked on a wide range of commerce initiatives, including consumer experience across Reels, Stories and Feed, as well as seller and creator setup and shop management.",
         links: [
           {
             label: "Instagram Shop",
@@ -58,7 +67,7 @@ const work = [
           }
         ],
         image:
-          "https://images.unsplash.com/photo-1520975922215-230f283c0f48?q=80&w=1600&auto=format&fit=crop"
+          "/images/ig.png"
       }
     ]
   },
@@ -74,7 +83,7 @@ const work = [
           "Prototyped and launched early mobile and operator tools enabling safe, reliable driverless delivery.",
         links: [{ label: "Nuro Press", href: "https://www.nuro.ai/press" }],
         image:
-          "https://images.unsplash.com/photo-1581093588401-22d78b6c26ca?q=80&w=1600&auto=format&fit=crop"
+          "/images/n.png"
       }
     ]
   },
@@ -90,7 +99,7 @@ const work = [
           "Improving in-store navigation, scheduling, and pay systems to increase reliability and efficiency for shoppers and drivers.",
         links: [{ label: "Instacart", href: "https://www.instacart.com" }],
         image:
-          "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=1600&auto=format&fit=crop"
+          "/images/i.png"
       }
     ]
   },
@@ -103,10 +112,10 @@ const work = [
       {
         title: "Discovery & Feed Interaction Model",
         blurb:
-          "",
+          "Explored feed interactions and social gestures to strengthen ranking signals and make personalization feel intuitive.",
         links: [{ label: "Teehan & Lax", href: "https://teehanlax.com/story/prismatic/" }],
         image:
-          "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1600&auto=format&fit=crop"
+          "/images/p.png"
       }
     ]
   }
@@ -242,17 +251,17 @@ export default function PersonalSite() {
         <div className="mt-4 sm:mt-6 space-y-8 sm:space-y-10">
           {work.map((w) => (
             <article key={w.org} className="space-y-4 sm:space-y-5">
-              <header className="flex items-baseline justify-between gap-3">
-                <h3 className="text-lg sm:text-xl font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 min-w-0">
+              <header className="grid grid-cols-[1fr,auto] items-start gap-2 sm:gap-3">
+                <h3 className="text-lg sm:text-xl font-semibold leading-6 sm:leading-7 text-zinc-900 dark:text-zinc-100 flex items-center gap-2 min-w-0">
                   <img
                     src={orgAvatars[w.org]}
                     alt=""
-                    className="w-6 h-6 rounded-full ring-1 ring-black/5 dark:ring-white/10 object-cover"
+                    className="w-6 h-6 rounded-full flex-shrink-0 ring-1 ring-black/5 dark:ring-white/10 object-cover"
                     aria-hidden
                   />
                   <span className="truncate">{w.org}</span>
                 </h3>
-                <div className="text-sm sm:text-base text-zinc-500">{w.period}</div>
+                <div className="text-sm sm:text-base text-zinc-500 text-right leading-6 sm:leading-7 pt-0.5 self-start">{w.period}</div>
               </header>
               <p className="text-[16px] sm:text-[17px] leading-8 text-zinc-700 dark:text-zinc-300 max-w-[68ch]">
                 {w.summary}
