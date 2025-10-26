@@ -12,6 +12,7 @@ interface Social { label: string; href: string; handle: string }
 interface LinkRef { label: string; href: string }
 interface Highlight { title: string; blurb: string; links: LinkRef[]; image: string }
 interface WorkItem { org: string; period: string; summary: string; highlights: Highlight[] }
+interface Degree { school: string; degree: string; year: string; blurb?: string; links?: LinkRef[] }
 
 const profile = {
   name: "Francisco Guzman",
@@ -27,10 +28,17 @@ const orgAvatars: Record<string, string> = {
   "Instagram (Meta)": "/images/instagram.jpg",
   Instacart: "/images/instacart.jpg",
   Nuro: "/images/n.png",
-  Prismatic: "/images/p.png"
+  Prismatic: "/images/p.png",
+  "Stanford University": "/images/s.jpg"
 };
 
 const educationImage = "/images/stanford.jpg";
+
+// Education data for full project-style cards (no image)
+const education: ReadonlyArray<Degree> = [
+  { school: "Stanford University", degree: "M.S. Symbolic Systems", year: "2013", blurb: undefined, links: [] },
+  { school: "Stanford University", degree: "B.S. Management Science & Engineering", year: "2012", blurb: undefined, links: [] }
+];
 
 const work: ReadonlyArray<WorkItem> = [
   {
@@ -125,46 +133,83 @@ function SocialRow({ socials }: { socials: ReadonlyArray<Social> }) {
   );
 }
 
-function HighlightCard({ h }: { h: Highlight }) {
+function ProjectCard({ item }: { item: { title: string; blurb?: string; links?: LinkRef[]; image?: string } }) {
+  const hasImage = Boolean(item.image);
   return (
-    <div className="group grid grid-cols-1 sm:grid-cols-[1fr_minmax(240px,40%)] gap-3 sm:gap-4 items-center rounded-2xl border border-zinc-200 dark:border-zinc-800 p-3 sm:p-4">
-      <div className="order-2 sm:order-1">
-        <h4 className="font-semibold text-base sm:text-lg text-zinc-900 dark:text-zinc-100 mb-1.5">{h.title}</h4>
-        <p className="text-sm sm:text-[15px] leading-7 text-zinc-700 dark:text-zinc-300 mb-2 sm:mb-3 max-w-[68ch]">{h.blurb}</p>
-        <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
-          {h.links?.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              className="underline decoration-zinc-400/70 underline-offset-2 text-zinc-900 dark:text-zinc-100 hover:decoration-zinc-800 dark:hover:decoration-zinc-200"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {l.label}
-            </a>
-          ))}
+    <div className={
+      "group grid gap-3 sm:gap-4 items-center rounded-2xl border border-zinc-200 dark:border-zinc-800 p-3 sm:p-4 " +
+      (hasImage ? "grid-cols-1 sm:grid-cols-[1fr_minmax(240px,40%)]" : "grid-cols-1")
+    }>
+      {/* Text */}
+      <div className={hasImage ? "order-2 sm:order-1" : "order-1"}>
+        <h4 className="font-semibold text-base sm:text-lg text-zinc-900 dark:text-zinc-100 mb-1.5">{item.title}</h4>
+        {item.blurb && (
+          <p className="text-sm sm:text-[15px] leading-7 text-zinc-700 dark:text-zinc-300 mb-2 sm:mb-3 max-w-[68ch]">{item.blurb}</p>
+        )}
+        {item.links && item.links.length > 0 && (
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+            {item.links.map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                className="underline decoration-zinc-400/70 underline-offset-2 text-zinc-900 dark:text-zinc-100 hover:decoration-zinc-800 dark:hover:decoration-zinc-200"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {l.label}
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+      {/* Optional Image */}
+      {hasImage && (
+        <div className="order-1 sm:order-2">
+          <img
+            src={item.image}
+            alt=""
+            className="w-full h-40 sm:h-36 md:h-40 object-cover rounded-2xl ring-1 ring-black/5 dark:ring-white/10"
+          />
         </div>
-      </div>
-      <div className="order-1 sm:order-2">
-        <img
-          src={h.image}
-          alt=""
-          className="w-full h-40 sm:h-36 md:h-40 object-cover rounded-2xl ring-1 ring-black/5 dark:ring-white/10"
-        />
-      </div>
+      )}
     </div>
   );
 }
 
+
 function EducationBlock() {
+  // Compute a compact year range like "2012 – 2013"
+  const years = education.map((d) => parseInt(d.year, 10)).filter((n) => !Number.isNaN(n));
+  const minYear = Math.min(...years);
+  const maxYear = Math.max(...years);
+  const range = Number.isFinite(minYear) && Number.isFinite(maxYear)
+    ? `${minYear} – ${maxYear}`
+    : "";
+
   return (
     <section id="education" className="scroll-mt-24">
       <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-zinc-800 dark:text-zinc-100 mb-2 sm:mb-3">Education</h2>
-      <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 sm:p-5">
-        <p className="text-base sm:text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-          Stanford University
-          <span className="font-normal text-zinc-700 dark:text-zinc-300"> | M.S. Symbolic Systems (2013) | B.S. Management Science & Engineering (2012)</span>
-        </p>
+
+      {/* Employer-style header for Stanford */}
+      <header className="grid grid-cols-[1fr,auto] items-start gap-2 sm:gap-3 mb-3 sm:mb-4">
+        <h3 className="text-lg sm:text-xl font-semibold leading-6 sm:leading-7 text-zinc-900 dark:text-zinc-100 flex items-center gap-2 min-w-0">
+          <img
+            src={orgAvatars["Stanford University"]}
+            alt="Stanford University"
+            className="w-6 h-6 rounded-full flex-shrink-0 ring-1 ring-black/5 dark:ring-white/10 object-cover"
+          />
+          <span className="truncate">Stanford University</span>
+        </h3>
+        {range && (
+          <div className="text-sm sm:text-base text-zinc-500 text-right leading-6 sm:leading-7 pt-0.5 self-start">{range}</div>
+        )}
+      </header>
+
+      {/* Degree cards reused from ProjectCard (no images initially) */}
+      <div className="space-y-4 sm:space-y-5">
+        {education.map((d) => (
+          <ProjectCard key={`${d.degree}-${d.year}`} item={{ title: d.degree, blurb: d.blurb, links: d.links }} />
+        ))}
       </div>
     </section>
   );
@@ -286,7 +331,7 @@ export default function PersonalSite() {
 
               <div className="space-y-4 sm:space-y-6">
                 {w.highlights.map((h) => (
-                  <HighlightCard key={`${w.org}-${h.title}`} h={h} />
+                  <ProjectCard key={`${w.org}-${h.title}`} item={h} />
                 ))}
               </div>
             </article>
